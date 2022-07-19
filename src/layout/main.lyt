@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="description" content="{{ META_DESCRIPTION }}" />
+    <title>{{ PAGE_TITLE }}</title>
+    <link rel="stylesheet" href="/styles/default.css" />
+    <link rel="stylesheet" href="/styles/a11y-dark.css" />
+</head>
+
+<body>
+    <a href="/">
+        <header>
+            <div>
+                <img height="40px" src="/imgs/zwc.logo.png" alt="Site Logo" />
+                <p>Zach Writes Code</p>
+            </div>
+        </header>
+    </a>
+
+    <div id="scroll-div" style="overflow:overlay;">
+        {{anchor "top-of-page"}}
+        <main>
+            <div class="content">
+                {{ CONTENT }}
+                <a href="https://buymeacoffee.com/zachx" target="_BLANK" class="buy-me-coffee">
+                    <img src="/imgs/bmc-button.png" alt="Buy Me A Coffee Button Image" />
+                    <p> If you enjoy this content, consider buying me a coffee to keep me fueled to make more!</p>
+                </a>
+            </div>
+
+            <div class="sidebar inflow">
+                <div id="sidebar">
+                    {{mdfile "layout/main-sidebar.md"}}
+                    {{SIDEBAR}}
+                </div>
+            </div>
+            <button id="mobile-sidebar-btn">Menu</button>
+
+        </main>
+    </div>
+    {{ dev-server }}
+    <script src="/scripts/main.js"></script>
+
+
+</body>
+
+</html>

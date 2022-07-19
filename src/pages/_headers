@@ -1,0 +1,11 @@
+https://:zwc-website.pages.dev/*
+  X-Robots-Tag: noindex
+
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-XSS-Protection: 1; mode=block
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: document-domain=()
+  Content-Security-Policy: script-src 'self' 'sha256-CMpFgUfdNK5S+iVLGTIK6eR/x0y6Ro0giaqXzSA65Lo='; frame-ancestors 'none';
