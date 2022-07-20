@@ -1,0 +1,21 @@
+<template id="my-card">
+    <style>
+        /* These styles are scoped only to the html inside this template */
+        #card {
+            border-radius: 5px;
+            border: 1px solid black;
+            padding: 5px;
+            margin: 5px;
+            max-width: 250px;
+        }
+    </style>
+
+    <div id="card">
+        <h1>
+            <slot name="title"></slot>
+        </h1>
+        <p>
+            <slot name="content"></slot>
+        </p>
+    </div>
+</template>

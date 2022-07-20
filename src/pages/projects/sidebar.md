@@ -1,2 +1,0 @@
-- #### [Top](#top-of-page)
-- #### [Small Business ERP](/projects/erp)

@@ -1,0 +1,210 @@
+<template id="file-list">
+    <style>
+        /* These styles are scoped only to the html inside this template */
+        #card {
+            border-radius: 5px;
+            border: 1px solid black;
+            padding: 5px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        td {
+            padding: 10px;
+            border-top: 1px solid grey;
+            cursor: pointer;
+        }
+
+        th {
+            text-align: left;
+        }
+    </style>
+
+    <div id="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Filename <span id="statusText"></span></th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <tr id="tr">
+                    <td>Loading Files...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script connected>
+        let fileList = [];
+        let fileTree = [];
+        let currentPath = [];
+        let fileCount = 0;
+
+        const db = new PouchDB("file-list");
+
+        elms.card.addEventListener("drop", (ev) => {
+            ev.preventDefault();
+            for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+                if (ev.dataTransfer.items[i].kind === 'file') {
+                    const entry = ev.dataTransfer.items[i].webkitGetAsEntry();
+                    scanFiles(entry);
+                }
+            }
+        })
+        elms.card.addEventListener("dragover", (ev) => {
+            ev.preventDefault();
+        })
+
+        function scanFiles(item, container) {
+            let curPath = "";
+            if (currentPath.length > 0)
+                curPath = "/" + currentPath.join("/");
+            if (item.isDirectory) {
+                uploadFile(curPath + item.fullPath + "/__empty__file__to__allow__empty__dir__", new Blob());
+                let directoryReader = item.createReader();
+                directoryReader.readEntries(function (entries) {
+                    entries.forEach(function (entry) {
+                        scanFiles(entry);
+                    });
+                });
+            }
+            if (item.isFile) {
+                updateStatus(1);
+                item.file((f) => {
+                    uploadFile(curPath + item.fullPath, f);
+                })
+            }
+        }
+
+        async function uploadFile(filename, file) {
+            const fileType = file.type || "application/octet-stream"
+            const results = await db.putAttachment(filename, filename, file, fileType)
+            updateStatus(-1);
+        }
+
+        function updateStatus(n) {
+            fileCount += n;
+            if (fileCount > 0) {
+                elms.statusText.innerText = ` Uploading ${fileCount} files `
+            } else {
+                elms.statusText.innerText = ``
+            }
+        }
+
+        await updateList()
+
+        var changes = db.changes({
+            since: 'now',
+            live: true,
+            include_docs: true
+        }).on('change', function (change) {
+            updateList();
+            // handle change
+        }).on('complete', function (info) {
+            // changes() was canceled
+        }).on('error', function (err) {
+            console.log(err);
+        });
+
+        async function updateList() {
+            await updateTree();
+            [...elms.tbody.children].map((c) => c.remove())
+            appendBreadCrumbs();
+            currentPath.length > 0 && appendTD({ isDotDot: true, name: ".." })
+            const currDirList = getDirListing();
+            currDirList.map((f) => appendTD(f))
+        }
+
+        function cloneTR() {
+            const tc = elms.tr.cloneNode(true);
+            const td = tc.qs("td")
+            td.innerText = "";
+            return [tc, td]
+        }
+
+        function appendBreadCrumbs() {
+            const [tc, td] = cloneTR();
+            appendSpan(td, "HOME", -1);
+            currentPath.map((dirName, idx) => {
+                appendSpan(td, dirName, idx)
+            })
+            elms.tbody.appendChild(tc);
+        }
+
+        function appendSpan(td, dirName, idx) {
+            const span = document.createElement("span")
+            span.innerText = ` ${dirName} / `
+            span.addEventListener("click", () => {
+                currentPath.splice(idx + 1)
+                updateList();
+            })
+            td.appendChild(span)
+        }
+
+        function appendTD(f) {
+            if (f.name === "__empty__file__to__allow__empty__dir__") return;
+            const [tc, td] = cloneTR();
+            td.innerText = f.name;
+            td.addEventListener("click", (ev) => {
+                if (f.isFile) return getFile(f.id)
+                if (f.isDir) {
+                    currentPath.push(f.name)
+                    updateList()
+                }
+                if (f.isDotDot) {
+                    currentPath.pop();
+                    updateList()
+                }
+            })
+            elms.tbody.appendChild(tc);
+        }
+
+        async function updateTree() {
+            const allFiles = await db.allDocs();
+            fileTree = { __files__list__: [] };
+            fileList = allFiles.rows.map((f) => {
+                const pathSplit = f.id.split("/");
+                const fileName = pathSplit.pop();
+                const dir = ensurePathExists(pathSplit)
+                dir.__files__list__.push({ name: fileName, id: f.id })
+                return f.id
+            })
+        }
+
+        function ensurePathExists(pathSplit) {
+            let currDir = fileTree;
+            for (let i = 1; i < pathSplit.length; i++) {
+                const dirName = pathSplit[i];
+                currDir[dirName] ||= { __files__list__: [] }
+                currDir = currDir[dirName]
+            }
+            return currDir
+        }
+
+        function getCurrentDirFromPathObject() {
+            let currDir = fileTree;
+            currentPath.map((c) => currDir = currDir[c])
+            return currDir;
+        }
+
+        function getDirListing() {
+            const currDir = getCurrentDirFromPathObject();
+            const dirs_not_files = Object.keys(currDir).filter((d) => d !== "__files__list__");
+            const dirs = dirs_not_files.map((name) => ({ isDir: true, name }))
+            const files = currDir.__files__list__.map((file) => ({ isFile: true, name: file.name, id: file.id }))
+            return [...dirs, ...files]
+        }
+
+        async function getFile(id) {
+            const file = await db.getAttachment(id, id);
+            const url = URL.createObjectURL(file);
+            window.open(url);
+        }
+
+    </script>
+
+</template>

@@ -6,7 +6,7 @@ function connectWS() {
     const sTop = localStorage.getItem("zwc-scroll-top");
     if (page === null || sTop === null || page !== location.pathname) return;
     document
-      .querySelector("#scroll-div")
+      .querySelector("body")
       .scrollTo({ top: sTop, left: 0, behavior: "instant" });
   });
   console.log("Attempting Connection to Websocket Server...");
@@ -38,7 +38,7 @@ function connectWS() {
       localStorage.setItem("zwc-scroll-path", location.pathname);
       localStorage.setItem(
         "zwc-scroll-top",
-        document.querySelector("#scroll-div").scrollTop
+        document.querySelector("body").scrollTop
       );
       setTimeout(() => {
         location.reload();
