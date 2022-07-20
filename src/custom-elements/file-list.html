@@ -100,7 +100,7 @@
 
         async function uploadFile(filename, file) {
             const fileType = file.type || "application/octet-stream"
-            const results = await db.putAttachment(filename, filename, file, fileType)
+            const results = await db.putAttachment(filename, file.name, file, fileType)
             updateStatus(-1);
         }
 
@@ -218,7 +218,8 @@
         }
 
         async function getFile(id) {
-            const file = await db.getAttachment(id, id);
+            const fileName = id.split("/").at(-1)
+            const file = await db.getAttachment(id, fileName);
             const url = URL.createObjectURL(file);
             window.open(url);
         }
