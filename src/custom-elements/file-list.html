@@ -52,16 +52,25 @@
             retry: true
         }).on('change', function (info) {
             // handle change
-        }).on('paused', function (err) {
+            elms.statusText.innerText = ` - Sync change ${info.direction}`
+        }).on('paused', function (info) {
             // replication paused (e.g. replication up to date, user went offline)
-        }).on('active', function () {
+            elms.statusText.innerText = "";
+        }).on('active', function (info) {
             // replicate resumed (e.g. new changes replicating, user went back online)
-        }).on('denied', function (err) {
+            elms.statusText.innerText = ` - Sync active ${info.direction}`
+        }).on('denied', function (info) {
             // a document failed to replicate (e.g. due to permissions)
+            console.log("DENIED", info);
+            elms.statusText.innerText = ` - Sync Denied`
         }).on('complete', function (info) {
             // handle complete
+            console.log("COMPLETE", info);
+            elms.statusText.innerText = ` - Sync Complete`
         }).on('error', function (err) {
             // handle error
+            console.log("ERROR", err);
+            elms.statusText.innerText = ` - Sync ERROR!`
         });
 
         elms.card.addEventListener("drop", (ev) => {
