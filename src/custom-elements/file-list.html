@@ -45,6 +45,24 @@
         let fileCount = 0;
 
         const db = new PouchDB("file-list");
+        const online_db = new PouchDB("https://couchdb.mmpmg.com/files-db");
+
+        var sync = PouchDB.sync(db, online_db, {
+            live: true,
+            retry: true
+        }).on('change', function (info) {
+            // handle change
+        }).on('paused', function (err) {
+            // replication paused (e.g. replication up to date, user went offline)
+        }).on('active', function () {
+            // replicate resumed (e.g. new changes replicating, user went back online)
+        }).on('denied', function (err) {
+            // a document failed to replicate (e.g. due to permissions)
+        }).on('complete', function (info) {
+            // handle complete
+        }).on('error', function (err) {
+            // handle error
+        });
 
         elms.card.addEventListener("drop", (ev) => {
             ev.preventDefault();
