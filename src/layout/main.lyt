@@ -11,9 +11,12 @@
     <!-- <link rel="stylesheet" href="/styles/a11y-dark.css" /> -->
 
     {{ HEAD }}
+    {{include "custom-elements/modal.html"}}
 </head>
 
 <body>
+
+    <my-modal></my-modal>
 
     <header bg fixed top full-width style="--bg: lightgrey">
         <div flex-row>

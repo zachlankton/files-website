@@ -1,0 +1,118 @@
+<template id="my-modal">
+    <style>
+        /* These styles are scoped only to the html inside this template */
+        #modal {
+            position: fixed;
+            max-width: 600px;
+            top: 10%;
+            left: 0px;
+            right: 0px;
+            bottom: 10%;
+            border-radius: 10px;
+            border: 1px solid black;
+            background-color: white;
+            margin: 0 auto;
+            z-index: 999999;
+        }
+
+        #modalBackdrop {
+            transition: all 200ms;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            z-index: 99999;
+        }
+
+        #modalBackdrop.show {
+            opacity: 1;
+        }
+
+        #header {
+            position: absolute;
+            height: 50px;
+            top: 0px;
+            width: 100%;
+            box-sizing: border-box;
+            border-bottom: 1px solid grey;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        #modalTitle {
+            font-weight: bolder;
+            line-height: 50px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        #content {
+            position: absolute;
+            top: 50px;
+            bottom: 50px;
+            overflow: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #footer {
+            position: absolute;
+            height: 50px;
+            bottom: 0px;
+            width: 100%;
+            box-sizing: border-box;
+            border-top: 1px solid grey;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        #footer>* {
+            flex: 1;
+            margin: 10px;
+        }
+    </style>
+
+    <div id="modalBackdrop">
+        <div id="modal">
+            <div id="header">
+                <div id="modalTitle">My Modal</div>
+            </div>
+            <div id="content"></div>
+            <div id="footer"><button>Close</button></div>
+        </div>
+    </div>
+
+
+    <script connected>
+        window.myModal = elms.modal
+        elms.modal.modalTitle = elms.modalTitle
+        elms.modal.content = elms.content
+        elms.modal.footer = elms.footer
+
+        elms.modal.show = () => {
+            elms.modalBackdrop.style.display = ""
+            setTimeout(() => { elms.modalBackdrop.classList.add("show") }, 10)
+            window.addEventListener("keydown", escapeKeyListener)
+        }
+
+        elms.modal.hide = () => {
+            elms.modalBackdrop.classList.remove("show")
+            setTimeout(() => { elms.modalBackdrop.style.display = "none" }, 200)
+            window.removeEventListener("keydown", escapeKeyListener)
+        }
+
+        elms.modalBackdrop.addEventListener("click", (ev) => {
+            if (ev.target.id === "modalBackdrop") elms.modal.hide();
+        })
+
+        function escapeKeyListener(ev) {
+            if (ev.key === "Escape") elms.modal.hide()
+        }
+
+    </script>
+</template>
