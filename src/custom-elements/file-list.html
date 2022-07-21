@@ -21,6 +21,18 @@
         th {
             text-align: left;
         }
+
+        #spinner {
+            transition: all 200ms;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            z-index: 99999;
+        }
     </style>
 
     <div id="card">
@@ -38,40 +50,43 @@
         </table>
     </div>
 
+    <div id="spinner" style="display:none;"></div>
+
     <script connected>
         let fileList = [];
         let fileTree = [];
         let currentPath = [];
         let fileCount = 0;
 
-        const db = new PouchDB("file-list");
-        const online_db = new PouchDB("https://couchdb.mmpmg.com/files-db");
+        // const db = new PouchDB("file-list");
+        // const online_db = new PouchDB("https://couchdb.mmpmg.com/files-db");
+        const db = new PouchDB("https://couchdb.mmpmg.com/files-db");
 
-        var sync = PouchDB.sync(db, online_db, {
-            live: true,
-            retry: true
-        }).on('change', function (info) {
-            // handle change
-            elms.statusText.innerText = ` - Sync change ${info.direction}`
-        }).on('paused', function (info) {
-            // replication paused (e.g. replication up to date, user went offline)
-            elms.statusText.innerText = "";
-        }).on('active', function (info) {
-            // replicate resumed (e.g. new changes replicating, user went back online)
-            elms.statusText.innerText = ` - Sync active ${info.direction}`
-        }).on('denied', function (info) {
-            // a document failed to replicate (e.g. due to permissions)
-            console.log("DENIED", info);
-            elms.statusText.innerText = ` - Sync Denied`
-        }).on('complete', function (info) {
-            // handle complete
-            console.log("COMPLETE", info);
-            elms.statusText.innerText = ` - Sync Complete`
-        }).on('error', function (err) {
-            // handle error
-            console.log("ERROR", err);
-            elms.statusText.innerText = ` - Sync ERROR!`
-        });
+        // var sync = PouchDB.sync(db, online_db, {
+        //     live: true,
+        //     retry: true
+        // }).on('change', function (info) {
+        //     // handle change
+        //     elms.statusText.innerText = ` - Sync change ${info.direction}`
+        // }).on('paused', function (info) {
+        //     // replication paused (e.g. replication up to date, user went offline)
+        //     elms.statusText.innerText = "";
+        // }).on('active', function (info) {
+        //     // replicate resumed (e.g. new changes replicating, user went back online)
+        //     elms.statusText.innerText = ` - Sync active ${info.direction}`
+        // }).on('denied', function (info) {
+        //     // a document failed to replicate (e.g. due to permissions)
+        //     console.log("DENIED", info);
+        //     elms.statusText.innerText = ` - Sync Denied`
+        // }).on('complete', function (info) {
+        //     // handle complete
+        //     console.log("COMPLETE", info);
+        //     elms.statusText.innerText = ` - Sync Complete`
+        // }).on('error', function (err) {
+        //     // handle error
+        //     console.log("ERROR", err);
+        //     elms.statusText.innerText = ` - Sync ERROR!`
+        // });
 
         elms.card.addEventListener("drop", (ev) => {
             ev.preventDefault();
@@ -234,10 +249,12 @@
         }
 
         async function getFile(id) {
+            window.mySpinner.show();
             const fileName = id.split("/").at(-1)
             const file = await db.getAttachment(id, fileName);
             const url = URL.createObjectURL(file);
             window.open(url);
+            window.mySpinner.hide();
         }
 
     </script>

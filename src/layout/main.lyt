@@ -12,11 +12,13 @@
 
     {{ HEAD }}
     {{include "custom-elements/modal.html"}}
+    {{include "custom-elements/spinner.html"}}
 </head>
 
 <body>
 
     <my-modal></my-modal>
+    <my-spinner></my-spinner>
 
     <header bg fixed top full-width style="--bg: lightgrey">
         <div flex-row>
