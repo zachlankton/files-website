@@ -1,6 +1,4 @@
 function connectWS() {
-  // just in case we forget to build before pushing to github
-  if (location.host !== "localhost:8000") return;
   window.addEventListener("DOMContentLoaded", (event) => {
     const page = localStorage.getItem("zwc-scroll-path");
     const sTop = localStorage.getItem("zwc-scroll-top");
