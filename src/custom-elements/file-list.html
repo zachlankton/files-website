@@ -21,18 +21,6 @@
         th {
             text-align: left;
         }
-
-        #spinner {
-            transition: all 200ms;
-            position: fixed;
-            top: 0px;
-            left: 0px;
-            right: 0px;
-            bottom: 0px;
-            background-color: rgba(0, 0, 0, 0.8);
-            opacity: 0;
-            z-index: 99999;
-        }
     </style>
 
     <div id="card">
@@ -50,18 +38,16 @@
         </table>
     </div>
 
-    <div id="spinner" style="display:none;"></div>
-
     <script connected>
-        let fileList = [];
-        let fileTree = [];
-        let currentPath = [];
-        let fileCount = 0;
 
         // const db = new PouchDB("file-list");
         // const online_db = new PouchDB("https://couchdb.mmpmg.com/files-db");
         const db = new PouchDB("https://couchdb.mmpmg.com/files-db");
 
+        let fileList = [];
+        let fileTree = [];
+        let currentPath = [];
+        let fileCount = 0;
         // var sync = PouchDB.sync(db, online_db, {
         //     live: true,
         //     retry: true
@@ -256,7 +242,5 @@
             window.open(url);
             window.mySpinner.hide();
         }
-
     </script>
-
 </template>
